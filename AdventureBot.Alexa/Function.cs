@@ -58,6 +58,7 @@ namespace AdventureBot.Alexa {
         //--- Fields ---
         private AmazonS3Client _s3Client;
         private AmazonDynamoDBClient _dynamoClient;
+        private AmazonSimpleNotificationServiceClient _SNSClient;
         private string _adventureFileBucket;
         private string _adventureFileKey;
         private string _adventureSoundFilesPublicUrl;
@@ -70,6 +71,7 @@ namespace AdventureBot.Alexa {
             // initialize clients
             _s3Client = new AmazonS3Client();
             _dynamoClient = new AmazonDynamoDBClient();
+            _SNSClient = new AmazonSimpleNotificationServiceClient();
 
             // read location of adventure files
             var adventureFiles = new Uri(config.ReadText("AdventureFiles"));
@@ -185,9 +187,17 @@ namespace AdventureBot.Alexa {
                 }
 
                 // check if the player reached the end
-                if(adventure.Places[state.CurrentPlaceId].Finished) {
-
+                var roomCompleteCounter = 0;
+                Dictionary<string, string> result = new Dictionary<string, string>();
+                if(adventure.Places[state.CurrentPlaceId].Finished) {   
                     // TODO: send completion notification with player statistics
+                    LogInfo("Current place at room end: " + state.CurrentPlaceId);
+                    LogInfo("STATUS at room end: " + state.Status);
+                    roomCompleteCounter++;
+                    //if(state.CurrentPlaceId == "end-room-good"){
+                        result.Add("rooms", roomCompleteCounter.ToString());
+                        await _SNSClient.PublishAsync(_adventurePlayerFinishedTopic, "Rooms completed: " + result["rooms"]);
+                    //}
                 }
 
                 // create/update player record so we can continue in a future session
