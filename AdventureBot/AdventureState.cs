@@ -33,6 +33,8 @@ namespace AdventureBot {
         //--- Fields ---
         public string CurrentPlaceId;
         public AdventureStatus Status = AdventureStatus.New;
+        public int RoomCount;
+        public DateTime StartTime;
 
         //--- Constructors ---
         public AdventureState(string currentPlaceId) {
@@ -43,6 +45,7 @@ namespace AdventureBot {
         public void Reset(string currentPlaceId) {
             Status = AdventureStatus.New;
             CurrentPlaceId = currentPlaceId;
+            StartTime = DateTime.Now;
         }
     }
 }

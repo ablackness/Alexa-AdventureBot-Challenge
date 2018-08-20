@@ -191,9 +191,12 @@ namespace AdventureBot.Alexa {
                 Dictionary<string, string> result = new Dictionary<string, string>();
                 if(adventure.Places[state.CurrentPlaceId].Finished) {   
                     // TODO: send completion notification with player statistics
+                    state.RoomCount++;
                     LogInfo("Current place at room end: " + state.CurrentPlaceId);
                     LogInfo("STATUS at room end: " + state.Status);
-                    roomCompleteCounter++;
+                    LogInfo("TIME at room complete: " + state.StartTime);
+                    LogInfo("ROOM COUNT at end: " + state.RoomCount);
+                    
                     //if(state.CurrentPlaceId == "end-room-good"){
                         result.Add("rooms", roomCompleteCounter.ToString());
                         await _SNSClient.PublishAsync(_adventurePlayerFinishedTopic, "Rooms completed: " + result["rooms"]);
